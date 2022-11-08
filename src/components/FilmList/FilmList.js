@@ -7,7 +7,7 @@ import './FilmList.css'
 
 export default class FilmList extends Component {
   static defaultProps = {
-    movies: [{}],
+    movies: [{ id: 0 }],
   }
 
   static propTypes = {

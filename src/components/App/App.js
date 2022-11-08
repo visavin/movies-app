@@ -11,7 +11,7 @@ export default class App extends Component {
   movieService = new ThemoviedbService()
 
   state = {
-    movies: [{}],
+    movies: [{ id: 0 }],
   }
 
   constructor(props) {
@@ -29,8 +29,6 @@ export default class App extends Component {
 
   render() {
     const { movies } = this.state
-
-    console.log(movies)
 
     return (
       <div className="container">
