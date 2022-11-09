@@ -1,5 +1,5 @@
 import { Component } from 'react'
-// import { DatePicker, Button } from 'antd'
+// import { Spin } from 'antd'
 
 import FilmList from '../FilmList'
 import ThemoviedbService from '../../services/ThemoviedbService'
@@ -33,8 +33,6 @@ export default class App extends Component {
     return (
       <div className="container">
         <FilmList movies={movies} />
-        {/*<DatePicker />*/}
-        {/*<Button type="primary">Button</Button>*/}
       </div>
     )
   }
