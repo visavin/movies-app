@@ -5,4 +5,25 @@
     width: 1010px;
     min-height: 100vh;
     background: #FFFFFF;
+    text-align: center;
+}
+
+.overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.9;
+    background-color: #000;
+    transition: all 0.75s ease-in-out;
+    z-index: 3;
+}
+
+.alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
 }
