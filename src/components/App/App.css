@@ -28,3 +28,48 @@
     transform: translate(-50%, -50%);
     z-index: 4;
 }
+
+.ant-pagination {
+    margin: 36px 0 0 0;
+    padding: 0;
+}
+
+.ant-pagination-item {
+    margin-right: 7px;
+    border: 0;
+    height: 22px;
+    min-width: 22.22px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 22px;
+    text-align: center;
+}
+
+.ant-pagination-item-active {
+    background: #1890FF;
+    border-radius: 4px;
+}
+
+.ant-pagination-item a {
+    padding: 0 8px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.ant-pagination-item-active a {
+    font-weight: 400;
+    color: #FFFFFF;
+}
+
+.ant-pagination-item-active:hover a {
+    color: #FFFFFF;
+}
+
+.ant-pagination-prev .ant-pagination-item-link, .ant-pagination-next .ant-pagination-item-link {
+    border: 0;
+}
+
+.ant-pagination-prev button, .ant-pagination-next button {
+    color: rgba(0, 0, 0, 0.65);
+}

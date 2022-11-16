@@ -83,15 +83,16 @@ export default class App extends Component {
     const spinner = loading ? <Spin size="large" /> : null
     const content = hasData ? <FilmList movies={movies} /> : null
     const emptySearch = emptySearchResult ? <p>The search yielded no results</p> : null
-    const pagination = hasData ? (
-      <Pagination
-        defaultPageSize={20}
-        showSizeChanger={false}
-        current={currentPage}
-        onChange={this.onChangePage}
-        total={totalResults}
-      />
-    ) : null
+    const pagination =
+      hasData && !emptySearchResult ? (
+        <Pagination
+          defaultPageSize={20}
+          showSizeChanger={false}
+          current={currentPage}
+          onChange={this.onChangePage}
+          total={totalResults}
+        />
+      ) : null
 
     return (
       <div className="container">
