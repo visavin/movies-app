@@ -1,9 +1,18 @@
 import { Component } from 'react'
 import { debounce } from 'lodash'
+import PropTypes from 'prop-types'
 
 import './Search.css'
 
 export default class Search extends Component {
+  static defaultProps = {
+    onAddedQuery: () => {},
+  }
+
+  static propTypes = {
+    onAddedQuery: PropTypes.func,
+  }
+
   state = {
     description: '',
   }

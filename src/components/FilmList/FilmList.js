@@ -7,11 +7,11 @@ import './FilmList.css'
 
 export default class FilmList extends Component {
   static defaultProps = {
-    movies: [{ id: 0 }],
+    movies: [],
   }
 
   static propTypes = {
-    movies: PropTypes.arrayOf(PropTypes.object).isRequired,
+    movies: PropTypes.array.isRequired,
   }
 
   render() {
