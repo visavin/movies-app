@@ -20,7 +20,11 @@ export default class FilmList extends Component {
 
       return (
         <li key={id}>
-          <Film filmInfo={filmInfo} />
+          <Film
+            filmInfo={filmInfo}
+            movieRate={this.props.moviesRates[id]}
+            onChangeMovieRate={(filmRate) => this.props.onChangeMoviesRates(id, filmRate)}
+          />
         </li>
       )
     })

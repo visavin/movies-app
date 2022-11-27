@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Spin, Alert, Pagination } from 'antd'
+import { Spin, Alert, Pagination, Tabs } from 'antd'
 import { Offline } from 'react-detect-offline'
 
 import FilmList from '../FilmList'
 import Search from '../Search'
 import ThemoviedbService from '../../services/ThemoviedbService'
+import { GenreProvider } from '../context'
 
 import 'antd/dist/antd.css'
 import './App.css'
@@ -13,13 +14,26 @@ export default class App extends Component {
   movieService = new ThemoviedbService()
 
   state = {
+    guestSessionId: '',
     movies: [],
+    moviesRates: {},
+    genres: [],
     totalPages: 1,
     totalResults: 0,
     currentPage: 1,
     query: '',
     loading: false,
     error: false,
+  }
+
+  onChangeMoviesRates = (filmId, filmRate) => {
+    console.log(filmId, ' ', filmRate)
+    console.log(this.state.moviesRates)
+    this.setState(({ moviesRates }) => {
+      return {
+        moviesRates: { ...moviesRates, [filmId]: filmRate },
+      }
+    })
   }
 
   onAddedQuery = (query) => {
@@ -49,13 +63,36 @@ export default class App extends Component {
       .catch(this.onError)
   }
 
+  startGuestSession() {
+    this.movieService
+      .guestSession()
+      .then((result) => {
+        this.setState({
+          guestSessionId: result.guest_session_id,
+        })
+      })
+      .catch(this.onError)
+  }
+
+  loadGenres() {
+    this.movieService
+      .getGenres()
+      .then((result) => {
+        this.setState({
+          genres: result.genres,
+        })
+      })
+      .catch(this.onError)
+  }
+
   onChangePage = (page) => {
     this.setState({ currentPage: page })
   }
 
-  // componentDidMount() {
-  //   this.updateMovies()
-  // }
+  componentDidMount() {
+    this.startGuestSession()
+    this.loadGenres()
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.query && this.state.query !== prevState.query) {
@@ -67,9 +104,7 @@ export default class App extends Component {
   }
 
   render() {
-    console.log(this.state.currentPage, ' ', this.state.totalPages)
-
-    const { movies, totalResults, currentPage, loading, error, query } = this.state
+    const { movies, moviesRates, totalResults, currentPage, loading, error, query } = this.state
     const hasData = !(loading || error || !query)
     const emptySearchResult = !(!hasData || movies.length)
     const errorMessage = error ? (
@@ -81,7 +116,9 @@ export default class App extends Component {
       />
     ) : null
     const spinner = loading ? <Spin size="large" /> : null
-    const content = hasData ? <FilmList movies={movies} /> : null
+    const content = hasData ? (
+      <FilmList movies={movies} moviesRates={moviesRates} onChangeMoviesRates={this.onChangeMoviesRates} />
+    ) : null
     const emptySearch = emptySearchResult ? <p>The search yielded no results</p> : null
     const pagination =
       hasData && !emptySearchResult ? (
@@ -99,12 +136,34 @@ export default class App extends Component {
         <Offline>
           <OfflineAlert />
         </Offline>
-        <Search onAddedQuery={this.onAddedQuery} />
-        {errorMessage}
-        {spinner}
-        {emptySearch}
-        {content}
-        {pagination}
+        <GenreProvider value={this.state.genres}>
+          <Tabs
+            defaultActiveKey="1"
+            centered
+            destroyInactiveTabPane
+            items={[
+              {
+                label: 'Search',
+                key: '1',
+                children: (
+                  <React.Fragment>
+                    <Search onAddedQuery={this.onAddedQuery} />
+                    {errorMessage}
+                    {spinner}
+                    {emptySearch}
+                    {content}
+                    {pagination}
+                  </React.Fragment>
+                ),
+              },
+              {
+                label: 'Rated',
+                key: '2',
+                children: 'Content of Tab Pane 2',
+              },
+            ]}
+          />
+        </GenreProvider>
       </div>
     )
   }
