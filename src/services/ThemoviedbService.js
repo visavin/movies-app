@@ -14,6 +14,36 @@ export default class ThemoviedbService {
     return await res.json()
   }
 
+  async postRequest(url, parameters = '', bodyRequest) {
+    const res = await fetch(`${this._apiBase}${url}?api_key=${this._apiKey}&${parameters}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify(bodyRequest),
+    })
+
+    if (!res.ok) {
+      throw new Error(`Could not fetch ${url}` + `, received ${res.status}`)
+    }
+    return await res.json()
+  }
+
+  async setRatedMovies(guestSessionId, movieId, movieRate) {
+    return await this.postRequest(`/movie/${movieId}/rating`, `guest_session_id=${guestSessionId}`, {
+      value: movieRate,
+    })
+  }
+
+  async getRatedMovies(guestSessionId) {
+    const films = await this.getResource(`/guest_session/${guestSessionId}/rated/movies`)
+    return {
+      filmList: films.results.map(this._transformFilm),
+      total_pages: films.total_pages,
+      total_results: films.total_results,
+    }
+  }
+
   async getGenres() {
     return await this.getResource('/genre/movie/list')
   }

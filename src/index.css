@@ -7,3 +7,7 @@ body {
 body {
     background: #E5E5E5;
 }
+
+*, *::before, *::after {
+     box-sizing: content-box;
+}

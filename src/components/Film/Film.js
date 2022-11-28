@@ -47,7 +47,12 @@ export default class Film extends Component {
                 <p className="film__date">{date}</p>
                 <ul className="film__types">{filmGenres}</ul>
                 <p className="film__description">{description}</p>
-                <Rate count={10} onChange={this.props.onChangeMovieRate} value={this.props.movieRate} />
+                <Rate
+                  allowClear={false}
+                  count={10}
+                  onChange={this.props.onChangeMovieRate}
+                  value={this.props.movieRate}
+                />
               </div>
             </div>
           )

@@ -16,6 +16,9 @@ export default class App extends Component {
   state = {
     guestSessionId: '',
     movies: [],
+    ratedMovies: [],
+    ratedTotalPages: 1,
+    ratedTotalResults: 0,
     moviesRates: {},
     genres: [],
     totalPages: 1,
@@ -27,13 +30,15 @@ export default class App extends Component {
   }
 
   onChangeMoviesRates = (filmId, filmRate) => {
-    console.log(filmId, ' ', filmRate)
-    console.log(this.state.moviesRates)
     this.setState(({ moviesRates }) => {
       return {
         moviesRates: { ...moviesRates, [filmId]: filmRate },
       }
     })
+    this.movieService
+      .setRatedMovies(this.state.guestSessionId, filmId, filmRate)
+      .then(() => this.updateRatedMovies(this.state.guestSessionId))
+      .catch(this.onError)
   }
 
   onAddedQuery = (query) => {
@@ -41,13 +46,23 @@ export default class App extends Component {
   }
 
   onMoviesLoaded = (movies) => {
-    this.setState({
+    this.setState(() => ({
       movies: movies.filmList,
       totalPages: movies.total_pages,
       totalResults: movies.total_results,
       loading: false,
       error: false,
-    })
+    }))
+  }
+
+  onRatedMoviesLoaded = (movies) => {
+    this.setState(() => ({
+      ratedMovies: movies.filmList,
+      ratedTotalPages: movies.total_pages,
+      ratedTotalResults: movies.total_results,
+      loading: false,
+      error: false,
+    }))
   }
 
   onError = (error) => {
@@ -70,8 +85,15 @@ export default class App extends Component {
         this.setState({
           guestSessionId: result.guest_session_id,
         })
+        return result.guest_session_id
       })
+      .then((guest_session_id) => this.updateRatedMovies(guest_session_id))
       .catch(this.onError)
+  }
+
+  updateRatedMovies(guestSessionId) {
+    // this.setState({ loading: true })
+    this.movieService.getRatedMovies(guestSessionId).then(this.onRatedMoviesLoaded).catch(this.onError)
   }
 
   loadGenres() {
@@ -101,10 +123,13 @@ export default class App extends Component {
     if (this.state.currentPage !== prevState.currentPage) {
       this.updateMovies()
     }
+    if (this.state.moviesRates !== prevState.moviesRates) {
+      this.updateRatedMovies(this.state.guestSessionId)
+    }
   }
 
   render() {
-    const { movies, moviesRates, totalResults, currentPage, loading, error, query } = this.state
+    const { movies, moviesRates, totalResults, currentPage, loading, error, query, ratedMovies } = this.state
     const hasData = !(loading || error || !query)
     const emptySearchResult = !(!hasData || movies.length)
     const errorMessage = error ? (
@@ -119,7 +144,11 @@ export default class App extends Component {
     const content = hasData ? (
       <FilmList movies={movies} moviesRates={moviesRates} onChangeMoviesRates={this.onChangeMoviesRates} />
     ) : null
+    const ratedContent = ratedMovies.length ? (
+      <FilmList movies={ratedMovies} moviesRates={moviesRates} onChangeMoviesRates={this.onChangeMoviesRates} />
+    ) : null
     const emptySearch = emptySearchResult ? <p>The search yielded no results</p> : null
+    const emptyRatedContent = !ratedMovies.length ? <p>The are no rated films</p> : null
     const pagination =
       hasData && !emptySearchResult ? (
         <Pagination
@@ -140,7 +169,7 @@ export default class App extends Component {
           <Tabs
             defaultActiveKey="1"
             centered
-            destroyInactiveTabPane
+            // destroyInactiveTabPane
             items={[
               {
                 label: 'Search',
@@ -159,7 +188,14 @@ export default class App extends Component {
               {
                 label: 'Rated',
                 key: '2',
-                children: 'Content of Tab Pane 2',
+                children: (
+                  <React.Fragment>
+                    {errorMessage}
+                    {spinner}
+                    {emptyRatedContent}
+                    {ratedContent}
+                  </React.Fragment>
+                ),
               },
             ]}
           />

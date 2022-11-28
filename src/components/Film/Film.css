@@ -36,14 +36,14 @@
 
 .film__vote {
     flex-shrink : 0;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border: 2px solid;
     border-radius: 50%;
     font-family: 'Inter';
     font-style: normal;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 22px;
     display: flex;
     align-items: center;
@@ -107,7 +107,6 @@
 
 .film__description {
     padding: 0;
-    /*width: 228px;*/
     margin: 0 0 7px;
 }
 
