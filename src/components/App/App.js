@@ -37,7 +37,12 @@ export default class App extends Component {
     })
     this.movieService
       .setRatedMovies(this.state.guestSessionId, filmId, filmRate)
-      .then(() => this.updateRatedMovies(this.state.guestSessionId))
+      .then(() => {
+        this.updateRatedMovies(this.state.guestSessionId)
+        setTimeout(() => {
+          this.updateRatedMovies(this.state.guestSessionId)
+        }, 1000)
+      })
       .catch(this.onError)
   }
 
@@ -148,7 +153,7 @@ export default class App extends Component {
       <FilmList movies={ratedMovies} moviesRates={moviesRates} onChangeMoviesRates={this.onChangeMoviesRates} />
     ) : null
     const emptySearch = emptySearchResult ? <p>The search yielded no results</p> : null
-    const emptyRatedContent = !ratedMovies.length ? <p>The are no rated films</p> : null
+    const emptyRatedContent = !ratedMovies.length && !error ? <p>There are no rated films</p> : null
     const pagination =
       hasData && !emptySearchResult ? (
         <Pagination
@@ -176,8 +181,8 @@ export default class App extends Component {
                 key: '1',
                 children: (
                   <React.Fragment>
-                    <Search onAddedQuery={this.onAddedQuery} />
                     {errorMessage}
+                    <Search onAddedQuery={this.onAddedQuery} />
                     {spinner}
                     {emptySearch}
                     {content}

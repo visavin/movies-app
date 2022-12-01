@@ -7,6 +7,8 @@ import { GenreConsumer } from '../context'
 
 import './Film.css'
 
+import noImageIcon from './No-Image-Placeholder.png'
+
 export default class Film extends Component {
   static defaultProps = {
     filmInfo: {},
@@ -16,8 +18,19 @@ export default class Film extends Component {
     filmInfo: PropTypes.object.isRequired,
   }
 
+  state = {
+    image: this.props.filmInfo.image,
+  }
+
+  onError = () => {
+    this.setState({
+      image: noImageIcon,
+    })
+  }
+
   render() {
-    const { title, date, description, image, vote, genreIds } = this.props.filmInfo
+    const { title, date, description, vote, genreIds } = this.props.filmInfo
+    const { image } = this.state
     let voteClass = classNames({
       'film__vote--red': vote > 0 && vote <= 3,
       'film__vote--orange': vote > 3 && vote <= 5,
@@ -38,7 +51,7 @@ export default class Film extends Component {
 
           return (
             <div className="film">
-              <img className="film__image" src={image} alt="" />
+              <img src={image} className="film__image" onError={this.onError} alt="" />
               <div className="film__info">
                 <div className="film__header">
                   <h5 className="film__title">{title}</h5>
