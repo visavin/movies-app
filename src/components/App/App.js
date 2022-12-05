@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Spin, Alert, Pagination, Tabs } from 'antd'
-import { Offline } from 'react-detect-offline'
+// import { Offline } from 'react-detect-offline'
 
 import FilmList from '../FilmList'
 import Search from '../Search'
@@ -14,6 +14,7 @@ export default class App extends Component {
   movieService = new ThemoviedbService()
 
   state = {
+    network: true,
     guestSessionId: '',
     movies: [],
     ratedMovies: [],
@@ -27,6 +28,10 @@ export default class App extends Component {
     query: '',
     loading: false,
     error: false,
+  }
+
+  onNetworkState = () => {
+    this.setState((prevState) => ({ network: !prevState.network }))
   }
 
   onChangeMoviesRates = (filmId, filmRate) => {
@@ -77,10 +82,14 @@ export default class App extends Component {
 
   updateMovies() {
     this.setState({ loading: true })
-    this.movieService
-      .searchFilms(this.state.query, this.state.currentPage)
-      .then(this.onMoviesLoaded)
-      .catch(this.onError)
+    if (this.state.query) {
+      this.movieService
+        .searchFilms(this.state.query, this.state.currentPage)
+        .then(this.onMoviesLoaded)
+        .catch(this.onError)
+    } else {
+      this.movieService.topRatedFilms(this.state.currentPage).then(this.onMoviesLoaded).catch(this.onError)
+    }
   }
 
   startGuestSession() {
@@ -97,7 +106,6 @@ export default class App extends Component {
   }
 
   updateRatedMovies(guestSessionId) {
-    // this.setState({ loading: true })
     this.movieService.getRatedMovies(guestSessionId).then(this.onRatedMoviesLoaded).catch(this.onError)
   }
 
@@ -119,6 +127,7 @@ export default class App extends Component {
   componentDidMount() {
     this.startGuestSession()
     this.loadGenres()
+    this.updateMovies()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -134,8 +143,9 @@ export default class App extends Component {
   }
 
   render() {
-    const { movies, moviesRates, totalResults, currentPage, loading, error, query, ratedMovies } = this.state
-    const hasData = !(loading || error || !query)
+    const { movies, moviesRates, totalResults, currentPage, loading, error, ratedMovies, network } = this.state
+    // const hasData = !(loading || error || !query)
+    const hasData = !(loading || error)
     const emptySearchResult = !(!hasData || movies.length)
     const errorMessage = error ? (
       <Alert
@@ -161,15 +171,18 @@ export default class App extends Component {
           showSizeChanger={false}
           current={currentPage}
           onChange={this.onChangePage}
-          total={totalResults}
+          total={totalResults < 10000 ? totalResults : 10000}
         />
       ) : null
+    const offlineAlert = !network ? <OfflineAlert /> : null
 
     return (
       <div className="container">
-        <Offline>
-          <OfflineAlert />
-        </Offline>
+        <NetworkState onNetworkState={this.onNetworkState} />
+        {offlineAlert}
+        {/*<Offline>*/}
+        {/*  <OfflineAlert />*/}
+        {/*</Offline>*/}
         <GenreProvider value={this.state.genres}>
           <Tabs
             defaultActiveKey="1"
@@ -223,4 +236,13 @@ const OfflineAlert = () => {
       />
     </React.Fragment>
   )
+}
+
+const NetworkState = ({ onNetworkState }) => {
+  window.onoffline = () => {
+    onNetworkState()
+  }
+  window.ononline = () => {
+    onNetworkState()
+  }
 }

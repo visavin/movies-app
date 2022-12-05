@@ -53,7 +53,16 @@ export default class ThemoviedbService {
   }
 
   async searchFilms(query, page) {
-    const films = await this.getResource('/search/movie/', `query=${query}&page=${page}`)
+    const films = await this.getResource('/search/movie', `query=${query}&page=${page}`)
+    return {
+      filmList: films.results.map(this._transformFilm),
+      total_pages: films.total_pages,
+      total_results: films.total_results,
+    }
+  }
+
+  async topRatedFilms(page) {
+    const films = await this.getResource('/movie/top_rated', `&page=${page}`)
     return {
       filmList: films.results.map(this._transformFilm),
       total_pages: films.total_pages,
